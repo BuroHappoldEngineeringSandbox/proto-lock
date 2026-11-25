@@ -5,7 +5,7 @@
     "proto-BHoM_Adapter": "dd15124dd69b47de3a55b409beed7e2924702abd",
     "proto-BHoM_Engine": "9047606f4fcf0802018a5ca5f47352bc2b5f5832",
     "proto-Excel_Toolkit": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
-    "proto-HTTP_Toolkit": "ffc54e8533247f847a54b0fc63949baec428d6da",
+    "proto-HTTP_Toolkit": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97",
     "proto-PowerPoint_Toolkit": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
   },
   "pending": [],
@@ -678,6 +678,32 @@
       "outcome": "skip: proto-HTTP_Toolkit@ffc54e85 already integrated",
       "policy": "E",
       "t": "2026-11-25T17:23:13Z"
+    },
+    {
+      "advanced": [
+        "proto-HTTP_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": 3,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97"
+        }
+      ],
+      "build_order": [
+        "proto-HTTP_Toolkit"
+      ],
+      "changes": {
+        "proto-HTTP_Toolkit": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "hold",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "E",
+      "t": "2026-11-25T19:49:04Z"
     }
   ],
   "waiting": {}

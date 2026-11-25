@@ -68,11 +68,11 @@
         }
       },
       "ok": true,
-      "sha": "ffc54e8533247f847a54b0fc63949baec428d6da",
-      "sha256": "c2ce3d26638378df1e700914455f14783b93c8aa3045277853deaf5f465c35b1",
+      "sha": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97",
+      "sha256": "5887c5e81b9632257e0627ee43cf582f56d7d70c1da9bb0d8afeb314d461f32a",
       "source": "integrator-rebuild",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-HTTP_Toolkit-ffc54e85-182517b4/proto-HTTP_Toolkit.zip",
-      "version": "ffc54e85-182517b4"
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-HTTP_Toolkit-4f3d9bbe-182517b4/proto-HTTP_Toolkit.zip",
+      "version": "4f3d9bbe-182517b4"
     },
     "proto-PowerPoint_Toolkit": {
       "built_against": {
