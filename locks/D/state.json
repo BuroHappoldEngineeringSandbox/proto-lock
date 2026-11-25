@@ -167,7 +167,28 @@
       "outcome": "advanced",
       "policy": "D",
       "t": "2026-11-25T15:07:13Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": 1,
+          "repo": "proto-PowerPoint_Toolkit",
+          "sha": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
+        }
+      ],
+      "outcome": "series waiting on BuroHappoldEngineeringSandbox/proto-Excel_Toolkit#3",
+      "policy": "D",
+      "t": "2026-11-25T15:11:09Z"
     }
   ],
-  "waiting": {}
+  "waiting": {
+    "proto-PowerPoint_Toolkit#1": {
+      "module": "proto-PowerPoint_Toolkit",
+      "notified": false,
+      "since": "2026-11-25T15:11:09Z",
+      "unmerged": [
+        "BuroHappoldEngineeringSandbox/proto-Excel_Toolkit#3"
+      ]
+    }
+  }
 }
