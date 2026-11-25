@@ -1,0 +1,59 @@
+name: integrate
+run-name: integrate ${{ github.event.action || inputs.kind }} ${{ github.event.client_payload.module || inputs.module }}
+on:
+  repository_dispatch:
+    types: [module, requeue]
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: tick re-evaluates timers and pending work; module integrates one module
+        type: choice
+        options: [tick, module]
+        default: tick
+      module:
+        description: module repository name, for kind=module
+        required: false
+        default: ''
+permissions:
+  contents: write
+concurrency:
+  group: proto-lock
+  queue: max
+jobs:
+  integrate:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - id: run
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KIND: ${{ github.event.action || inputs.kind }}
+          MODULE: ${{ github.event.client_payload.module || inputs.module }}
+        run: |
+          python scripts/integrate.py integrate --module "$env:MODULE" --kind $env:KIND | Tee-Object -FilePath records.jsonl
+          if ($LASTEXITCODE -ne 0) { throw "integrate.py failed" }
+      - name: Commit locks
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add locks
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { Write-Host "no lock change"; exit 0 }
+          git commit -q -m "lock: ${{ github.event.action || inputs.kind }} ${{ github.event.client_payload.module || inputs.module }} (run ${{ github.run_id }})"
+          git push origin HEAD:main
+          if ($LASTEXITCODE -ne 0) { throw "push failed" }
+      - name: Re-queue pending work
+        if: steps.run.outputs.requeue == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/dispatches" -f event_type=requeue
+          if ($LASTEXITCODE -ne 0) { throw "requeue dispatch failed" }

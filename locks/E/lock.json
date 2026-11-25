@@ -1,0 +1,8 @@
+{
+  "core": {
+    "sha256": "9d1ca2aab9b5359a5f21520fe1aafc60a01af76e77d998224cf1e0d8f608a2fd",
+    "tag": "core-f7ba043c-fa543e0c-4ce149cc",
+    "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-core/releases/download/core-f7ba043c-fa543e0c-4ce149cc/core.zip"
+  },
+  "modules": {}
+}
