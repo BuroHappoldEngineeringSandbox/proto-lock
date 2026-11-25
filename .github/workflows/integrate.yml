@@ -1,8 +1,8 @@
 name: integrate
-run-name: integrate ${{ github.event.action || inputs.kind }} ${{ github.event.client_payload.module || inputs.module }}
+run-name: integrate ${{ github.event.action || inputs.kind }} ${{ github.event.client_payload.kind }} ${{ github.event.client_payload.module || inputs.module }}
 on:
   repository_dispatch:
-    types: [module, requeue]
+    types: [module, requeue, retry]
   workflow_dispatch:
     inputs:
       kind:
@@ -33,10 +33,11 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-          KIND: ${{ github.event.action || inputs.kind }}
+          KIND: ${{ github.event.client_payload.kind || github.event.action || inputs.kind }}
+          RETRY: ${{ github.event.client_payload.retry || '0' }}
           MODULE: ${{ github.event.client_payload.module || inputs.module }}
         run: |
-          python scripts/integrate.py integrate --module "$env:MODULE" --kind $env:KIND | Tee-Object -FilePath records.jsonl
+          python scripts/integrate.py integrate --module "$env:MODULE" --kind $env:KIND --retry $env:RETRY | Tee-Object -FilePath records.jsonl
           if ($LASTEXITCODE -ne 0) { throw "integrate.py failed" }
       - name: Commit locks
         shell: pwsh
@@ -57,3 +58,13 @@ jobs:
         run: |
           gh api "repos/${{ github.repository }}/dispatches" -f event_type=requeue
           if ($LASTEXITCODE -ne 0) { throw "requeue dispatch failed" }
+      - name: Re-queue once after a staging failure
+        if: failure() && steps.run.outputs.staging_retry == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KIND: ${{ github.event.client_payload.kind || github.event.action || inputs.kind }}
+          MODULE: ${{ github.event.client_payload.module || inputs.module }}
+        run: |
+          gh api "repos/${{ github.repository }}/dispatches" -f event_type=retry -f "client_payload[kind]=$env:KIND" -f "client_payload[module]=$env:MODULE" -f "client_payload[retry]=1"
+          if ($LASTEXITCODE -ne 0) { throw "retry dispatch failed" }

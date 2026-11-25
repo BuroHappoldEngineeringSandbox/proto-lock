@@ -114,6 +114,35 @@ _built: dict[str, dict] = {}
 BUILDS: list[dict] = []
 
 
+class StagingError(RuntimeError):
+    """An upstream artefact could not be fetched or failed its hash check. Infrastructure, not a
+    build failure: the run aborts and nothing is blamed on the module being staged."""
+
+
+def published_hash(url: str) -> str:
+    with urllib.request.urlopen(url) as resp:
+        return hashlib.sha256(resp.read()).hexdigest()
+
+
+def reuse_release(repo: str, tag: str, module: str, version: str, source: str) -> dict | None:
+    """An existing release of exactly this version, with the hash of the asset actually published."""
+    try:
+        rel = gh(f"repos/{OWNER}/{repo}/releases/tags/{tag}")
+    except RuntimeError:
+        return None
+    asset = next((a for a in rel["assets"] if a["name"] == f"{module}.zip"), None)
+    manifest_asset = next((a for a in rel["assets"] if a["name"] == "manifest.json"), None)
+    if asset is None or manifest_asset is None:
+        return None
+    with urllib.request.urlopen(manifest_asset["browser_download_url"]) as resp:
+        manifest = json.loads(resp.read().decode("utf-8-sig"))
+    if not manifest.get("ok") or manifest.get("version") != version:
+        return None
+    url = asset["browser_download_url"]
+    BUILDS.append({"module": module, "version": version, "seconds": 0, "ok": True, "source": source})
+    return {"ok": True, "source": source, "url": url, "sha256": published_hash(url)}
+
+
 def core_tag(stage: dict) -> str | None:
     return stage["core"]["tag"] if stage.get("core") else None
 
@@ -127,20 +156,14 @@ def build(module: str, sha: str, stage: dict) -> dict:
         return _built[version]
     entry = {"sha": sha, "version": version,
              "built_against": {"core": core_tag(stage), "deps": dep_versions}}
-    try:
-        rel = gh(f"repos/{OWNER}/{module}/releases/tags/m-{version}")
-        manifest_asset = next(a for a in rel["assets"] if a["name"] == "manifest.json")
-        with urllib.request.urlopen(manifest_asset["browser_download_url"]) as resp:
-            manifest = json.loads(resp.read().decode("utf-8-sig"))
-        if manifest.get("ok") and manifest["version"] == version:
-            BUILDS.append({"module": module, "version": version, "seconds": 0, "ok": True, "source": "module-release"})
-            entry.update(ok=True, source="module-release",
-                         url=f"https://github.com/{OWNER}/{module}/releases/download/m-{version}/{module}.zip",
-                         sha256=manifest["payload_sha256"])
+    # Never rebuild a published version: builds are not byte-reproducible.
+    for repo, tag, source in ((module, f"m-{version}", "module-release"),
+                              ("proto-lock", f"a-{module}-{version}", "integrator-release")):
+        found = reuse_release(repo, tag, module, version, source)
+        if found:
+            entry.update(found)
             _built[version] = entry
             return entry
-    except RuntimeError:
-        pass  # no module release for this exact version: build it here
     out = OUT / version
     sfile = out.with_suffix(".stage.json")
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -150,6 +173,8 @@ def build(module: str, sha: str, stage: dict) -> dict:
                         "-Module", module, "-Sha", sha, "-Stage", str(sfile), "-OutDir", str(out)])
     seconds = round(time.monotonic() - started, 1)
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8-sig"))
+    if r.returncode == 2:
+        raise StagingError(f"staging {module}@{sha[:8]}: {manifest.get('reason', 'unknown')}")
     if r.returncode != 0 or not manifest.get("ok"):
         BUILDS.append({"module": module, "version": version, "seconds": seconds, "ok": False, "source": "integrator-build"})
         entry.update(ok=False, reason=manifest.get("reason", f"exit {r.returncode}"))
@@ -160,12 +185,19 @@ def build(module: str, sha: str, stage: dict) -> dict:
                           "-R", f"{OWNER}/proto-lock", "--title", tag,
                           "--notes", f"Rebuilt by the integrator: {module}@{sha} against {json.dumps(dep_versions)}, core {core_tag(stage)}"],
                          capture_output=True, text=True)
-    if rel.returncode != 0 and "already exists" not in rel.stderr:
-        raise RuntimeError(f"release {tag} failed: {rel.stderr.strip()}")
+    url = f"https://github.com/{OWNER}/proto-lock/releases/download/{tag}/{module}.zip"
+    if rel.returncode != 0:
+        if "already exists" not in rel.stderr:
+            raise RuntimeError(f"release {tag} failed: {rel.stderr.strip()}")
+        # Another run published this version first: the published asset is the truth.
+        entry.update(ok=True, source="integrator-release", url=url, sha256=published_hash(url))
+        _built[version] = entry
+        return entry
     BUILDS.append({"module": module, "version": version, "seconds": seconds, "ok": True, "source": "integrator-build"})
-    entry.update(ok=True, source="integrator-rebuild",
-                 url=f"https://github.com/{OWNER}/proto-lock/releases/download/{tag}/{module}.zip",
-                 sha256=manifest["payload_sha256"])
+    published = published_hash(url)
+    if published != manifest["payload_sha256"]:
+        raise StagingError(f"published {tag} hash {published} differs from the build's {manifest['payload_sha256']}")
+    entry.update(ok=True, source="integrator-rebuild", url=url, sha256=published)
     _built[version] = entry
     return entry
 
@@ -424,8 +456,7 @@ def run_policy(policy: str, module: str | None, kind: str) -> list[dict]:
                 if x not in todo:
                     todo.append(x)
     state["runs"] += records
-    save(policy, lock, state)
-    return records
+    return records, lock, state
 
 
 def main():
@@ -439,6 +470,7 @@ def main():
     i = sub.add_parser("integrate")
     i.add_argument("--module", default="")
     i.add_argument("--kind", choices=["module", "tick", "requeue"], required=True)
+    i.add_argument("--retry", default="0")
     a = ap.parse_args()
     if a.cmd == "stage":
         lock = json.loads(Path(a.lock).read_text())
@@ -449,9 +481,23 @@ def main():
         Path(a.out).write_text(json.dumps(st))
         return
     pending_before = {p: list(load(p)[1].get("pending", [])) for p in POLICIES}
-    all_records = []
-    for p in POLICIES:
-        all_records += run_policy(p, a.module or None, a.kind)
+    all_records, results = [], {}
+    gh_out = os.environ.get("GITHUB_OUTPUT")
+    try:
+        for p in POLICIES:
+            recs, lock, state = run_policy(p, a.module or None, a.kind)
+            all_records += recs
+            results[p] = (lock, state)
+    except StagingError as err:
+        retry = a.retry == "1"
+        print(f"::error title=staging failed, run aborted, no lock changed::{err}"
+              + (" Second failure: stopping, not re-queued." if retry else " Re-queued once."))
+        if gh_out:
+            with open(gh_out, "a") as f:
+                f.write(f"staging_retry={'false' if retry else 'true'}\n")
+        sys.exit(1)
+    for p, (lock, state) in results.items():
+        save(p, lock, state)
     for r in all_records:
         print(json.dumps(r, sort_keys=True))
     with open(LOCKS / "timings.jsonl", "a", newline="\n") as f:
@@ -459,7 +505,6 @@ def main():
                             "module": a.module, "builds": BUILDS}, sort_keys=True) + "\n")
     pending_after = {p: load(p)[1].get("pending", []) for p in POLICIES}
     need = any(pending_after[p] and pending_after[p] != pending_before[p] for p in POLICIES)
-    gh_out = os.environ.get("GITHUB_OUTPUT")
     if gh_out:
         with open(gh_out, "a") as f:
             f.write(f"requeue={'true' if need else 'false'}\n")
