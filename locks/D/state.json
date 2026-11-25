@@ -1,9 +1,10 @@
 {
   "dropped": {},
-  "integrated": {},
-  "pending": [
-    "proto-PowerPoint_Toolkit"
-  ],
+  "integrated": {
+    "proto-Excel_Toolkit": "33d40a4c4873974f5f5442530d59f2deb0e3b758",
+    "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
+  },
+  "pending": [],
   "quarantine": {},
   "runs": [
     {
@@ -22,6 +23,52 @@
       "outcome": "deferred: upstream not in lock",
       "policy": "D",
       "t": "2026-11-25T14:40:13Z"
+    },
+    {
+      "advanced": [
+        "proto-Excel_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-Excel_Toolkit",
+          "sha": "33d40a4c4873974f5f5442530d59f2deb0e3b758"
+        }
+      ],
+      "changes": {
+        "proto-Excel_Toolkit": "33d40a4c4873974f5f5442530d59f2deb0e3b758"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "drop",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "D",
+      "t": "2026-11-25T14:41:17Z"
+    },
+    {
+      "advanced": [
+        "proto-PowerPoint_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-PowerPoint_Toolkit",
+          "sha": "b74bcd37530ce94763ba90875991c33228c65d8a"
+        }
+      ],
+      "changes": {
+        "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "drop",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "D",
+      "t": "2026-11-25T14:41:18Z"
     }
   ],
   "waiting": {}
