@@ -2,8 +2,9 @@
   "dropped": {},
   "integrated": {},
   "pending": [
-    "proto-BHoM_Engine",
+    "proto-PowerPoint_Toolkit",
     "proto-Excel_Toolkit",
+    "proto-BHoM_Engine",
     "proto-HTTP_Toolkit"
   ],
   "pending_on_upstream": {},
@@ -111,6 +112,80 @@
       "outcome": "deferred: upstream not in lock",
       "policy": "D",
       "t": "2026-11-25T16:28:19Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": 1,
+          "repo": "proto-PowerPoint_Toolkit",
+          "sha": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
+        },
+        {
+          "pr": 3,
+          "repo": "proto-Excel_Toolkit",
+          "sha": "10a677b82be21eacaa232d5c7946b67ba1bf6614"
+        }
+      ],
+      "changes": {
+        "proto-Excel_Toolkit": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
+        "proto-PowerPoint_Toolkit": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
+      },
+      "mode": "drop",
+      "note": "series",
+      "outcome": "deferred: upstream not in lock",
+      "policy": "D",
+      "t": "2026-11-25T16:29:09Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-BHoM_Engine",
+          "sha": "1bdcce4a344154c8ff966e0838ab3a167ced4767"
+        }
+      ],
+      "changes": {
+        "proto-BHoM_Engine": "1bdcce4a344154c8ff966e0838ab3a167ced4767"
+      },
+      "mode": "drop",
+      "note": "single",
+      "outcome": "deferred: upstream not in lock",
+      "policy": "D",
+      "t": "2026-11-25T16:29:10Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": 3,
+          "repo": "proto-Excel_Toolkit",
+          "sha": "10a677b82be21eacaa232d5c7946b67ba1bf6614"
+        }
+      ],
+      "changes": {
+        "proto-Excel_Toolkit": "10a677b82be21eacaa232d5c7946b67ba1bf6614"
+      },
+      "mode": "drop",
+      "note": "single",
+      "outcome": "deferred: upstream not in lock",
+      "policy": "D",
+      "t": "2026-11-25T16:29:11Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "10fbf446e5c4e8ef3933ee5ab57654e7af09dbcf"
+        }
+      ],
+      "changes": {
+        "proto-HTTP_Toolkit": "10fbf446e5c4e8ef3933ee5ab57654e7af09dbcf"
+      },
+      "mode": "drop",
+      "note": "single",
+      "outcome": "deferred: upstream not in lock",
+      "policy": "D",
+      "t": "2026-11-25T16:29:12Z"
     }
   ],
   "waiting": {}
