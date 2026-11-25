@@ -15,6 +15,7 @@ Rules (SA, 2026-11-25):
     exactly. Nothing integrates until every member is merged; after 24 h unresolved, notify only.
 """
 import argparse
+import time
 import datetime as dt
 import hashlib
 import json
@@ -26,7 +27,7 @@ import urllib.request
 from pathlib import Path
 
 OWNER = "BuroHappoldEngineeringSandbox"
-CORE = {"BHoM", "BHoM_Engine", "BHoM_Adapter"}
+CORE: set[str] = set()  # Stage 4b: core repos are ordinary modules
 POLICIES = ("A", "D", "E")
 HOLD_MINUTES = 15
 NOTIFY_HOURS = 24
@@ -77,8 +78,8 @@ def deps_of(module: str, sha: str) -> list[str]:
     return _deps_cache[key]
 
 
-def version_of(sha: str, core_tag: str, dep_versions: dict[str, str]) -> str:
-    basis = [f"core={core_tag}"] + [f"{k}={dep_versions[k]}" for k in sorted(dep_versions)]
+def version_of(sha: str, core_tag: str | None, dep_versions: dict[str, str]) -> str:
+    basis = [f"core={core_tag or 'none'}"] + [f"{k}={dep_versions[k]}" for k in sorted(dep_versions)]
     return sha[:8] + "-" + hashlib.sha256(";".join(basis).encode()).hexdigest()[:8]
 
 
@@ -110,21 +111,29 @@ def stage_for(module: str, sha: str, lock: dict, overlay: dict) -> dict | None:
 _built: dict[str, dict] = {}
 
 
+BUILDS: list[dict] = []
+
+
+def core_tag(stage: dict) -> str | None:
+    return stage["core"]["tag"] if stage.get("core") else None
+
+
 def build(module: str, sha: str, stage: dict) -> dict:
     """Returns a lock entry plus ok. Reuses the module repo's own release when it was built
     against exactly this stage; otherwise builds here and publishes on proto-lock."""
     dep_versions = {k: v["version"] for k, v in stage["deps"].items()}
-    version = version_of(sha, stage["core"]["tag"], dep_versions)
+    version = version_of(sha, core_tag(stage), dep_versions)
     if version in _built:
         return _built[version]
     entry = {"sha": sha, "version": version,
-             "built_against": {"core": stage["core"]["tag"], "deps": dep_versions}}
+             "built_against": {"core": core_tag(stage), "deps": dep_versions}}
     try:
         rel = gh(f"repos/{OWNER}/{module}/releases/tags/m-{version}")
         manifest_asset = next(a for a in rel["assets"] if a["name"] == "manifest.json")
         with urllib.request.urlopen(manifest_asset["browser_download_url"]) as resp:
             manifest = json.loads(resp.read().decode("utf-8-sig"))
         if manifest.get("ok") and manifest["version"] == version:
+            BUILDS.append({"module": module, "version": version, "seconds": 0, "ok": True, "source": "module-release"})
             entry.update(ok=True, source="module-release",
                          url=f"https://github.com/{OWNER}/{module}/releases/download/m-{version}/{module}.zip",
                          sha256=manifest["payload_sha256"])
@@ -136,20 +145,24 @@ def build(module: str, sha: str, stage: dict) -> dict:
     sfile = out.with_suffix(".stage.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     sfile.write_text(json.dumps(stage))
+    started = time.monotonic()
     r = subprocess.run(["pwsh", "-NoProfile", "-File", str(ROOT / "scripts" / "build.ps1"),
                         "-Module", module, "-Sha", sha, "-Stage", str(sfile), "-OutDir", str(out)])
+    seconds = round(time.monotonic() - started, 1)
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8-sig"))
     if r.returncode != 0 or not manifest.get("ok"):
+        BUILDS.append({"module": module, "version": version, "seconds": seconds, "ok": False, "source": "integrator-build"})
         entry.update(ok=False, reason=manifest.get("reason", f"exit {r.returncode}"))
         _built[version] = entry
         return entry
     tag = f"a-{module}-{version}"
     rel = subprocess.run(["gh", "release", "create", tag, str(out / f"{module}.zip"), str(out / "manifest.json"),
                           "-R", f"{OWNER}/proto-lock", "--title", tag,
-                          "--notes", f"Rebuilt by the integrator: {module}@{sha} against {json.dumps(dep_versions)}, core {stage['core']['tag']}"],
+                          "--notes", f"Rebuilt by the integrator: {module}@{sha} against {json.dumps(dep_versions)}, core {core_tag(stage)}"],
                          capture_output=True, text=True)
     if rel.returncode != 0 and "already exists" not in rel.stderr:
         raise RuntimeError(f"release {tag} failed: {rel.stderr.strip()}")
+    BUILDS.append({"module": module, "version": version, "seconds": seconds, "ok": True, "source": "integrator-build"})
     entry.update(ok=True, source="integrator-rebuild",
                  url=f"https://github.com/{OWNER}/proto-lock/releases/download/{tag}/{module}.zip",
                  sha256=manifest["payload_sha256"])
@@ -224,8 +237,9 @@ def topo(changes: dict[str, str]) -> list[str]:
 
 
 def attempt(policy: str, lock: dict, state: dict, changes: dict[str, str], blame: list[dict],
-            mode: str) -> dict:
-    """Integrate one change unit. mode: 'hold' (A, and E before T) or 'drop' (D, and E after T)."""
+            mode: str, held: frozenset = frozenset()) -> dict:
+    """Integrate one change unit. mode: 'hold' (A, and E before T) or 'drop' (D, and E after T).
+    held: upstreams in this unit whose change is quarantined (a joint run with fixes)."""
     overlay: dict[str, dict] = {}
     record = {"t": now(), "policy": policy, "mode": mode, "changes": changes, "blame": blame}
     for m in topo(changes):
@@ -239,10 +253,13 @@ def attempt(policy: str, lock: dict, state: dict, changes: dict[str, str], blame
             return record
         e = build(m, changes[m], st)
         if not e["ok"]:
-            # The change itself does not build: quarantine it under every policy.
-            for x in changes:
+            # The change itself does not build. In a joint run only the failing fix is blamed;
+            # the held upstream stays held as it was.
+            culprits = [m] if held and m not in held else list(changes)
+            for x in culprits:
                 state["quarantine"].setdefault(x, {"sha": changes[x], "since": now(), "reason": f"own build failed: {m}", "blame": blame})
                 state["quarantine"][x]["sha"] = changes[x]
+                state["pending_on_upstream"].pop(x, None)
             record.update(outcome="rejected: change does not build", failing=[m])
             return record
         overlay[m] = e
@@ -262,6 +279,17 @@ def attempt(policy: str, lock: dict, state: dict, changes: dict[str, str], blame
         if mode == "hold":
             break
         excluded |= {x} | set(dependents({**lock["modules"], **overlay}, {x}, retry))
+    if failing and mode == "hold" and held:
+        # A dependent whose code did not change still breaks: blame stays on the held upstream,
+        # and the fixes wait for it, unblamed.
+        for u in held:
+            state["quarantine"][u]["reason"] = f"breaks {failing[0]}"
+        for x in changes:
+            if x not in held:
+                state["pending_on_upstream"][x] = {"sha": changes[x], "upstream": sorted(held), "since": now()}
+        record.update(outcome=f"held: upstream still breaks {failing[0]}; fixes pending on upstream",
+                      failing=failing, pending_on_upstream=sorted(set(changes) - held))
+        return record
     if failing and mode == "hold":
         for m in changes:
             state["quarantine"][m] = {"sha": changes[m], "since": state["quarantine"].get(m, {}).get("since", now()),
@@ -280,10 +308,26 @@ def attempt(policy: str, lock: dict, state: dict, changes: dict[str, str], blame
     for m in cleared:
         del state["quarantine"][m]
     for m in changes:
+        state["pending_on_upstream"].pop(m, None)
+    for m in changes:
         state["integrated"][m] = changes[m]
     record.update(outcome="advanced" if not failing else "advanced, dependents dropped",
                   advanced=sorted(overlay), dropped=sorted(excluded), cleared=cleared, failing=failing)
     return record
+
+
+def upstreams(module: str, sha: str, lock: dict) -> set[str]:
+    """Transitive upstream modules of module at sha, via the lock's versions of each upstream."""
+    seen: set[str] = set()
+    stack = [(module, sha)]
+    while stack:
+        m, s2 = stack.pop()
+        for d in deps_of(m, s2):
+            if d not in seen:
+                seen.add(d)
+                if d in lock["modules"]:
+                    stack.append((d, lock["modules"][d]["sha"]))
+    return seen
 
 
 def series_unit(state: dict, module: str, sha: str) -> tuple[dict[str, str] | None, list[dict], str]:
@@ -315,8 +359,8 @@ def series_unit(state: dict, module: str, sha: str) -> tuple[dict[str, str] | No
 
 def run_policy(policy: str, module: str | None, kind: str) -> list[dict]:
     lock, state = load(policy)
-    for k in ("quarantine", "dropped", "integrated", "pending", "waiting", "runs"):
-        state.setdefault(k, {} if k not in ("pending", "runs") else [])
+    for k in ("quarantine", "dropped", "integrated", "pending", "waiting", "runs", "pending_on_upstream", "reverted_fix"):
+        state.setdefault(k, [] if k in ("pending", "runs") else {})
     records = []
     t = dt.datetime.now(dt.timezone.utc)
     for key, w in state["waiting"].items():
@@ -326,7 +370,8 @@ def run_policy(policy: str, module: str | None, kind: str) -> list[dict]:
     if policy == "E":
         for m, q in list(state["quarantine"].items()):
             if q["reason"].startswith("breaks") and t - parse_time(q["since"]) >= dt.timedelta(minutes=HOLD_MINUTES):
-                rec = attempt(policy, lock, state, {m: q["sha"]}, q["blame"], "drop")
+                fixes = {x: f["sha"] for x, f in state["pending_on_upstream"].items() if m in f["upstream"]}
+                rec = attempt(policy, lock, state, {m: q["sha"], **fixes}, q["blame"], "drop")
                 rec["note"] = f"E hold of {HOLD_MINUTES} min expired"
                 records.append(rec)
     todo = []
@@ -348,9 +393,36 @@ def run_policy(policy: str, module: str | None, kind: str) -> list[dict]:
             records.append({"t": now(), "policy": policy, "outcome": note, "blame": blame})
             continue
         mode = "drop" if policy == "D" else "hold"
-        rec = attempt(policy, lock, state, changes, blame, mode)
+        held: set[str] = set()
+        if mode == "hold":
+            for u, uq in state["quarantine"].items():
+                if u in changes or not uq["reason"].startswith("breaks"):
+                    continue
+                if any(u in upstreams(x, changes[x], lock) for x in changes):
+                    held.add(u)
+            if held:
+                for u in held:
+                    changes[u] = state["quarantine"][u]["sha"]
+                    for x, f in state["pending_on_upstream"].items():
+                        if u in f["upstream"] and x not in changes:
+                            changes[x] = f["sha"]
+                note += f"; joint run with held {', '.join(sorted(held))}"
+        # A newer version of a held upstream (such as a revert) supersedes it: fixes waiting on it
+        # re-run afterwards as ordinary changes.
+        released = [x for x, f in state["pending_on_upstream"].items() if m in f["upstream"] and m not in held]
+        rec = attempt(policy, lock, state, changes, blame, mode, frozenset(held))
         rec["note"] = note
+        if any(x in state["reverted_fix"] for x in changes) and not rec["outcome"].startswith("advanced"):
+            rec["alert"] = "this fix targeted an upstream change that was reverted"
+        for x in changes:
+            state["reverted_fix"].pop(x, None)
         records.append(rec)
+        if released and m in rec.get("cleared", []):
+            for x in released:
+                state["pending_on_upstream"].pop(x, None)
+                state["reverted_fix"][x] = True
+                if x not in todo:
+                    todo.append(x)
     state["runs"] += records
     save(policy, lock, state)
     return records
@@ -382,6 +454,9 @@ def main():
         all_records += run_policy(p, a.module or None, a.kind)
     for r in all_records:
         print(json.dumps(r, sort_keys=True))
+    with open(LOCKS / "timings.jsonl", "a", newline="\n") as f:
+        f.write(json.dumps({"t": now(), "run_id": os.environ.get("GITHUB_RUN_ID"), "kind": a.kind,
+                            "module": a.module, "builds": BUILDS}, sort_keys=True) + "\n")
     pending_after = {p: load(p)[1].get("pending", []) for p in POLICIES}
     need = any(pending_after[p] and pending_after[p] != pending_before[p] for p in POLICIES)
     gh_out = os.environ.get("GITHUB_OUTPUT")

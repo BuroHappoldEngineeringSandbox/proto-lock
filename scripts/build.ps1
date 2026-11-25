@@ -23,7 +23,7 @@ function Write-Manifest([bool] $ok, [string] $version, [string] $reason, $files,
         ok            = $ok
         reason        = $reason
         version       = $version
-        built_against = [ordered]@{ core = $stageData.core.tag; deps = $deps }
+        built_against = [ordered]@{ core = $coreTag; deps = $deps }
         payload_sha256 = $payloadHash
         files         = @($files)
     } | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $OutDir 'manifest.json') -Encoding utf8
@@ -42,14 +42,15 @@ function Expand-Verified([string] $url, [string] $expected, [string] $label) {
 
 # Version: commit plus a digest of exactly what it was built against, so the same source built
 # against different upstreams gets a different version. integrate.py computes the same string.
-$basis = @("core=$($stageData.core.tag)") + @($stageData.deps.PSObject.Properties | Sort-Object Name | ForEach-Object { "$($_.Name)=$($_.Value.version)" })
+$coreTag = if ($stageData.core) { $stageData.core.tag } else { $null }
+$basis = @("core=$(if ($coreTag) { $coreTag } else { 'none' })") + @($stageData.deps.PSObject.Properties | Sort-Object Name | ForEach-Object { "$($_.Name)=$($_.Value.version)" })
 $digest = [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes(($basis -join ';')))).Replace('-', '').ToLower().Substring(0, 8)
 $version = $Sha.Substring(0, 8) + '-' + $digest
 
 try {
     if (Test-Path $asm) { Remove-Item $asm -Recurse -Force }
     New-Item -ItemType Directory -Force $asm | Out-Null
-    Expand-Verified $stageData.core.url $stageData.core.sha256 'core'
+    if ($stageData.core) { Expand-Verified $stageData.core.url $stageData.core.sha256 'core' }
     foreach ($p in $stageData.deps.PSObject.Properties) { Expand-Verified $p.Value.url $p.Value.sha256 $p.Name }
 } catch {
     Write-Host "::error title=staging failed::$($_.Exception.Message)"

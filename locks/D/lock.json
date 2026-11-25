@@ -1,47 +1,4 @@
 {
-  "core": {
-    "sha256": "9d1ca2aab9b5359a5f21520fe1aafc60a01af76e77d998224cf1e0d8f608a2fd",
-    "tag": "core-f7ba043c-fa543e0c-4ce149cc",
-    "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-core/releases/download/core-f7ba043c-fa543e0c-4ce149cc/core.zip"
-  },
-  "modules": {
-    "proto-Excel_Toolkit": {
-      "built_against": {
-        "core": "core-f7ba043c-fa543e0c-4ce149cc",
-        "deps": {}
-      },
-      "ok": true,
-      "sha": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
-      "sha256": "6663fbe4a50cca2e397871d20e97a6aa8db2a10b2e1e87cc08940b9c1dbb76e0",
-      "source": "module-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-Excel_Toolkit/releases/download/m-10a677b8-7a34b00a/proto-Excel_Toolkit.zip",
-      "version": "10a677b8-7a34b00a"
-    },
-    "proto-HTTP_Toolkit": {
-      "built_against": {
-        "core": "core-f7ba043c-fa543e0c-4ce149cc",
-        "deps": {}
-      },
-      "ok": true,
-      "sha": "ad4b02d094fcc25397aa5265f44ab4ea0841df5b",
-      "sha256": "923d63688af32099b31ab48251508356267d4f405da0eaa8c521f786a627e72f",
-      "source": "module-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-ad4b02d0-7a34b00a/proto-HTTP_Toolkit.zip",
-      "version": "ad4b02d0-7a34b00a"
-    },
-    "proto-PowerPoint_Toolkit": {
-      "built_against": {
-        "core": "core-f7ba043c-fa543e0c-4ce149cc",
-        "deps": {
-          "proto-Excel_Toolkit": "10a677b8-7a34b00a"
-        }
-      },
-      "ok": true,
-      "sha": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa",
-      "sha256": "cf3985373f9af274b240d1b5ab394a7297716400363712b8db18c28351c7bf7c",
-      "source": "integrator-rebuild",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-PowerPoint_Toolkit-1e03cd17-0c549afe/proto-PowerPoint_Toolkit.zip",
-      "version": "1e03cd17-0c549afe"
-    }
-  }
+  "core": null,
+  "modules": {}
 }
