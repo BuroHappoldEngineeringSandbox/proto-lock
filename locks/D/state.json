@@ -1,23 +1,11 @@
 {
-  "dropped": {
-    "proto-HTTP_Toolkit": {
-      "because": [
-        {
-          "pr": 4,
-          "repo": "proto-BHoM_Engine",
-          "sha": "e2fa495d2c8de948833d93f19fe57767d42ad882"
-        }
-      ],
-      "sha": "b93b536972b63a6718c8e4f1902843c0308698f1",
-      "since": "2026-11-25T20:03:33Z"
-    }
-  },
+  "dropped": {},
   "integrated": {
     "proto-BHoM": "be891e991dcdfd0dc2fcb04bac89504b6a0ff659",
     "proto-BHoM_Adapter": "dd15124dd69b47de3a55b409beed7e2924702abd",
     "proto-BHoM_Engine": "e2fa495d2c8de948833d93f19fe57767d42ad882",
     "proto-Excel_Toolkit": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
-    "proto-HTTP_Toolkit": "b93b536972b63a6718c8e4f1902843c0308698f1",
+    "proto-HTTP_Toolkit": "20d36409d26d9bfdcf0c4b07f73082b351274a47",
     "proto-PowerPoint_Toolkit": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
   },
   "pending": [],
@@ -776,6 +764,32 @@
       "outcome": "advanced, dependents dropped",
       "policy": "D",
       "t": "2026-11-25T20:03:25Z"
+    },
+    {
+      "advanced": [
+        "proto-HTTP_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": 5,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "20d36409d26d9bfdcf0c4b07f73082b351274a47"
+        }
+      ],
+      "build_order": [
+        "proto-HTTP_Toolkit"
+      ],
+      "changes": {
+        "proto-HTTP_Toolkit": "20d36409d26d9bfdcf0c4b07f73082b351274a47"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "drop",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "D",
+      "t": "2026-11-25T20:07:53Z"
     }
   ],
   "waiting": {}
