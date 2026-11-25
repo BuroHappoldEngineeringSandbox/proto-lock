@@ -6,7 +6,20 @@
     "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
   },
   "pending": [],
-  "quarantine": {},
+  "quarantine": {
+    "proto-Excel_Toolkit": {
+      "blame": [
+        {
+          "pr": 1,
+          "repo": "proto-Excel_Toolkit",
+          "sha": "94194f7abb6927a2c484d92ef885eb4390f09dda"
+        }
+      ],
+      "reason": "breaks proto-PowerPoint_Toolkit",
+      "sha": "94194f7abb6927a2c484d92ef885eb4390f09dda",
+      "since": "2026-11-25T14:47:21Z"
+    }
+  },
   "runs": [
     {
       "blame": [
@@ -93,6 +106,26 @@
       "outcome": "advanced",
       "policy": "A",
       "t": "2026-11-25T14:42:08Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": 1,
+          "repo": "proto-Excel_Toolkit",
+          "sha": "94194f7abb6927a2c484d92ef885eb4390f09dda"
+        }
+      ],
+      "changes": {
+        "proto-Excel_Toolkit": "94194f7abb6927a2c484d92ef885eb4390f09dda"
+      },
+      "failing": [
+        "proto-PowerPoint_Toolkit"
+      ],
+      "mode": "hold",
+      "note": "single",
+      "outcome": "held: change breaks a dependent",
+      "policy": "A",
+      "t": "2026-11-25T14:46:54Z"
     }
   ],
   "waiting": {}
