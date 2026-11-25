@@ -17,6 +17,18 @@
       "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-Excel_Toolkit/releases/download/m-33d40a4c-7a34b00a/proto-Excel_Toolkit.zip",
       "version": "33d40a4c-7a34b00a"
     },
+    "proto-HTTP_Toolkit": {
+      "built_against": {
+        "core": "core-f7ba043c-fa543e0c-4ce149cc",
+        "deps": {}
+      },
+      "ok": true,
+      "sha": "e297da9cfdd22c165b0b74a4652c7aa58d09263e",
+      "sha256": "9cf8807c116d0585715b867634b073c7881c4a4165fa4e7eba7141576486e3f0",
+      "source": "module-release",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-e297da9c-7a34b00a/proto-HTTP_Toolkit.zip",
+      "version": "e297da9c-7a34b00a"
+    },
     "proto-PowerPoint_Toolkit": {
       "built_against": {
         "core": "core-f7ba043c-fa543e0c-4ce149cc",

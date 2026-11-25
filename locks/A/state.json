@@ -2,6 +2,7 @@
   "dropped": {},
   "integrated": {
     "proto-Excel_Toolkit": "33d40a4c4873974f5f5442530d59f2deb0e3b758",
+    "proto-HTTP_Toolkit": "e297da9cfdd22c165b0b74a4652c7aa58d09263e",
     "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
   },
   "pending": [],
@@ -69,6 +70,29 @@
       "outcome": "advanced",
       "policy": "A",
       "t": "2026-11-25T14:40:44Z"
+    },
+    {
+      "advanced": [
+        "proto-HTTP_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "e297da9cfdd22c165b0b74a4652c7aa58d09263e"
+        }
+      ],
+      "changes": {
+        "proto-HTTP_Toolkit": "e297da9cfdd22c165b0b74a4652c7aa58d09263e"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "hold",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "A",
+      "t": "2026-11-25T14:42:08Z"
     }
   ],
   "waiting": {}
