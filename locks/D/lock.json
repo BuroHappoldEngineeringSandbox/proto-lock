@@ -23,11 +23,11 @@
         "deps": {}
       },
       "ok": true,
-      "sha": "e297da9cfdd22c165b0b74a4652c7aa58d09263e",
-      "sha256": "9cf8807c116d0585715b867634b073c7881c4a4165fa4e7eba7141576486e3f0",
+      "sha": "ad4b02d094fcc25397aa5265f44ab4ea0841df5b",
+      "sha256": "923d63688af32099b31ab48251508356267d4f405da0eaa8c521f786a627e72f",
       "source": "module-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-e297da9c-7a34b00a/proto-HTTP_Toolkit.zip",
-      "version": "e297da9c-7a34b00a"
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-ad4b02d0-7a34b00a/proto-HTTP_Toolkit.zip",
+      "version": "ad4b02d0-7a34b00a"
     }
   }
 }

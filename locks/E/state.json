@@ -2,7 +2,7 @@
   "dropped": {},
   "integrated": {
     "proto-Excel_Toolkit": "33d40a4c4873974f5f5442530d59f2deb0e3b758",
-    "proto-HTTP_Toolkit": "e297da9cfdd22c165b0b74a4652c7aa58d09263e",
+    "proto-HTTP_Toolkit": "ad4b02d094fcc25397aa5265f44ab4ea0841df5b",
     "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
   },
   "pending": [],
@@ -126,6 +126,29 @@
       "outcome": "held: change breaks a dependent",
       "policy": "E",
       "t": "2026-11-25T14:47:23Z"
+    },
+    {
+      "advanced": [
+        "proto-HTTP_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": 1,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "ad4b02d094fcc25397aa5265f44ab4ea0841df5b"
+        }
+      ],
+      "changes": {
+        "proto-HTTP_Toolkit": "ad4b02d094fcc25397aa5265f44ab4ea0841df5b"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "hold",
+      "note": "single",
+      "outcome": "advanced",
+      "policy": "E",
+      "t": "2026-11-25T14:51:59Z"
     }
   ],
   "waiting": {}
