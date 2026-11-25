@@ -532,6 +532,13 @@ def main():
             with open(gh_out, "a") as f:
                 f.write(f"staging_retry={'false' if retry else 'true'}\n")
         sys.exit(1)
+    if os.environ.get("PROTO_TEST_SEED_UNBUILT") == "true":
+        # Test-only (re-run 3c): corrupt one in-memory pairing so the check below must refuse.
+        lock_a = results["A"][0]
+        victim = next(m for m, e in sorted(lock_a["modules"].items()) if e.get("built_against", {}).get("deps"))
+        dep = sorted(lock_a["modules"][victim]["built_against"]["deps"])[0]
+        lock_a["modules"][victim]["built_against"]["deps"][dep] = "seeded-bad-version"
+        print(f"::notice title=test flag::seeded an unbuilt pair in lock A: {victim} against {dep}")
     bad = {p: unbuilt_pairs(lock) for p, (lock, state) in results.items()}
     if any(bad.values()):
         for p, pairs in bad.items():

@@ -14,6 +14,10 @@ on:
         description: module repository name, for kind=module
         required: false
         default: ''
+      test_seed_unbuilt:
+        description: TEST ONLY. Seed an unbuilt pair in lock A before the check (must be refused)
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -35,6 +39,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           KIND: ${{ github.event.client_payload.kind || github.event.action || inputs.kind }}
           RETRY: ${{ github.event.client_payload.retry || '0' }}
+          PROTO_TEST_SEED_UNBUILT: ${{ inputs.test_seed_unbuilt == true && 'true' || 'false' }}
           MODULE: ${{ github.event.client_payload.module || inputs.module }}
         run: |
           python scripts/integrate.py integrate --module "$env:MODULE" --kind $env:KIND --retry $env:RETRY | Tee-Object -FilePath records.jsonl
