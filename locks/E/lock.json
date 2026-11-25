@@ -11,11 +11,11 @@
         "deps": {}
       },
       "ok": true,
-      "sha": "33d40a4c4873974f5f5442530d59f2deb0e3b758",
-      "sha256": "ecc0749e30784b83d21db4bfab98d162e49e0a001330273e1b96513de0cb8ff5",
+      "sha": "94194f7abb6927a2c484d92ef885eb4390f09dda",
+      "sha256": "edd177ce6b5d80c411354a829b143e88c007502ed55c5c2163edc936d5f2c6f0",
       "source": "module-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-Excel_Toolkit/releases/download/m-33d40a4c-7a34b00a/proto-Excel_Toolkit.zip",
-      "version": "33d40a4c-7a34b00a"
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-Excel_Toolkit/releases/download/m-94194f7a-7a34b00a/proto-Excel_Toolkit.zip",
+      "version": "94194f7a-7a34b00a"
     },
     "proto-HTTP_Toolkit": {
       "built_against": {
@@ -28,20 +28,6 @@
       "source": "module-release",
       "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-ad4b02d0-7a34b00a/proto-HTTP_Toolkit.zip",
       "version": "ad4b02d0-7a34b00a"
-    },
-    "proto-PowerPoint_Toolkit": {
-      "built_against": {
-        "core": "core-f7ba043c-fa543e0c-4ce149cc",
-        "deps": {
-          "proto-Excel_Toolkit": "33d40a4c-7a34b00a"
-        }
-      },
-      "ok": true,
-      "sha": "b74bcd37530ce94763ba90875991c33228c65d8a",
-      "sha256": "3fd08d07dfa2bfe627766f7029404da29764d6f9415e26872d106e16bed5b801",
-      "source": "integrator-rebuild",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-PowerPoint_Toolkit-b74bcd37-b403e174/proto-PowerPoint_Toolkit.zip",
-      "version": "b74bcd37-b403e174"
     }
   }
 }
