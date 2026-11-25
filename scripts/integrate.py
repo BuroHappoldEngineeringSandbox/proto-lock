@@ -253,6 +253,38 @@ def dependents(lock_modules: dict, roots: set[str], extra: dict[str, str]) -> li
     return order
 
 
+def build_order(changes: dict[str, str], deps_in_run: list[str], lock: dict, retry: dict[str, str]) -> list[str]:
+    """One dependency order over the changes and their dependents together."""
+    sha = {m: e["sha"] for m, e in lock["modules"].items()}
+    sha.update(retry)
+    sha.update(changes)
+    nodes = set(changes) | set(deps_in_run)
+    order: list[str] = []
+
+    def visit(m):
+        if m in order:
+            return
+        for d in deps_of(m, sha[m]):
+            if d in nodes:
+                visit(d)
+        order.append(m)
+    for m in sorted(nodes):
+        visit(m)
+    return order
+
+
+def unbuilt_pairs(lock: dict) -> list[str]:
+    """Every (module, upstream) pair in the lock whose upstream version differs from what the
+    module was built against."""
+    bad = []
+    for m, e in sorted(lock["modules"].items()):
+        for d, v in sorted(e.get("built_against", {}).get("deps", {}).items()):
+            have = lock["modules"].get(d, {}).get("version")
+            if have != v:
+                bad.append(f"{m} built against {d} {v}, lock has {have}")
+    return bad
+
+
 def topo(changes: dict[str, str]) -> list[str]:
     order: list[str] = []
 
@@ -274,32 +306,36 @@ def attempt(policy: str, lock: dict, state: dict, changes: dict[str, str], blame
     held: upstreams in this unit whose change is quarantined (a joint run with fixes)."""
     overlay: dict[str, dict] = {}
     record = {"t": now(), "policy": policy, "mode": mode, "changes": changes, "blame": blame}
-    for m in topo(changes):
-        st = stage_for(m, changes[m], lock, overlay)
-        if st is None:
+    retry = {m: d["sha"] for m, d in state.get("dropped", {}).items()}
+    # Defer if a change needs an upstream that is neither in the lock nor in this run.
+    for m in changes:
+        if any(d not in lock["modules"] and d not in changes for d in deps_of(m, changes[m])):
             record["outcome"] = "deferred: upstream not in lock"
-            state.setdefault("pending", [])
             for x in changes:
                 if x not in state["pending"]:
                     state["pending"].append(x)
             return record
-        e = build(m, changes[m], st)
-        if not e["ok"]:
-            # The change itself does not build. In a joint run only the failing fix is blamed;
-            # the held upstream stays held as it was.
-            culprits = [m] if held and m not in held else list(changes)
-            for x in culprits:
-                state["quarantine"].setdefault(x, {"sha": changes[x], "since": now(), "reason": f"own build failed: {m}", "blame": blame})
-                state["quarantine"][x]["sha"] = changes[x]
-                state["pending_on_upstream"].pop(x, None)
-            record.update(outcome="rejected: change does not build", failing=[m])
-            return record
-        overlay[m] = e
-    retry = {m: d["sha"] for m, d in state.get("dropped", {}).items()}
+    order = build_order(changes, dependents(lock["modules"], set(changes), retry), lock, retry)
+    record["build_order"] = order
     failing: list[str] = []
     excluded: set[str] = set()
-    for x in dependents(lock["modules"], set(changes), retry):
+    for x in order:
         if x in excluded:
+            continue
+        if x in changes:
+            st = stage_for(x, changes[x], lock, overlay)
+            e = build(x, changes[x], st) if st is not None else {"ok": False, "reason": "upstream missing"}
+            if not e["ok"]:
+                # The change itself does not build. In a joint run only the failing fix is blamed;
+                # the held upstream stays held as it was.
+                culprits = [x] if held and x not in held else list(changes)
+                for c in culprits:
+                    state["quarantine"].setdefault(c, {"sha": changes[c], "since": now(), "reason": f"own build failed: {x}", "blame": blame})
+                    state["quarantine"][c]["sha"] = changes[c]
+                    state["pending_on_upstream"].pop(c, None)
+                record.update(outcome="rejected: change does not build", failing=[x])
+                return record
+            overlay[x] = e
             continue
         sha = lock["modules"][x]["sha"] if x in lock["modules"] else retry[x]
         st = stage_for(x, sha, lock, overlay)
@@ -495,6 +531,12 @@ def main():
         if gh_out:
             with open(gh_out, "a") as f:
                 f.write(f"staging_retry={'false' if retry else 'true'}\n")
+        sys.exit(1)
+    bad = {p: unbuilt_pairs(lock) for p, (lock, state) in results.items()}
+    if any(bad.values()):
+        for p, pairs in bad.items():
+            for pair in pairs:
+                print(f"::error title=unbuilt pair in lock {p}, run aborted, no lock written::{pair}")
         sys.exit(1)
     for p, (lock, state) in results.items():
         save(p, lock, state)
