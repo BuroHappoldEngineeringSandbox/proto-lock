@@ -1,8 +1,28 @@
 {
   "dropped": {},
   "integrated": {},
-  "pending": [],
+  "pending": [
+    "proto-PowerPoint_Toolkit"
+  ],
   "quarantine": {},
-  "runs": [],
+  "runs": [
+    {
+      "blame": [
+        {
+          "pr": null,
+          "repo": "proto-PowerPoint_Toolkit",
+          "sha": "b74bcd37530ce94763ba90875991c33228c65d8a"
+        }
+      ],
+      "changes": {
+        "proto-PowerPoint_Toolkit": "b74bcd37530ce94763ba90875991c33228c65d8a"
+      },
+      "mode": "hold",
+      "note": "single",
+      "outcome": "deferred: upstream not in lock",
+      "policy": "A",
+      "t": "2026-11-25T14:40:11Z"
+    }
+  ],
   "waiting": {}
 }
