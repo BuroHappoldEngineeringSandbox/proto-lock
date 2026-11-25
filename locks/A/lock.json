@@ -18,15 +18,15 @@
         "core": null,
         "deps": {
           "proto-BHoM": "be891e99-bf315cc9",
-          "proto-BHoM_Engine": "9047606f-f8e6169a"
+          "proto-BHoM_Engine": "a4751ac5-f8e6169a"
         }
       },
       "ok": true,
       "sha": "dd15124dd69b47de3a55b409beed7e2924702abd",
-      "sha256": "1a17f7a058ed3b3bfcd3456765a69071202fd79a42b943247926e036f1ff9931",
-      "source": "integrator-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Adapter-dd15124d-62230eed/proto-BHoM_Adapter.zip",
-      "version": "dd15124d-62230eed"
+      "sha256": "aad31ca01133d4327efeb45a0ca8dff611188b338903858a97a16d0cd5fe3123",
+      "source": "integrator-rebuild",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Adapter-dd15124d-16d105b2/proto-BHoM_Adapter.zip",
+      "version": "dd15124d-16d105b2"
     },
     "proto-BHoM_Engine": {
       "built_against": {
@@ -36,60 +36,60 @@
         }
       },
       "ok": true,
-      "sha": "9047606f4fcf0802018a5ca5f47352bc2b5f5832",
-      "sha256": "31b7fb6605a7f2cf7616f617d7c3da394f9ceffd3b684a7669fbfa7ccab18eaf",
-      "source": "module-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM_Engine/releases/download/m-9047606f-f8e6169a/proto-BHoM_Engine.zip",
-      "version": "9047606f-f8e6169a"
+      "sha": "a4751ac5644c5c48f4b1ed2551afbc474e9afb36",
+      "sha256": "3e6a5737595148529aec3e42d7b727b9091f336c12e50b4fdc7920ddab440a08",
+      "source": "integrator-rebuild",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Engine-a4751ac5-f8e6169a/proto-BHoM_Engine.zip",
+      "version": "a4751ac5-f8e6169a"
     },
     "proto-Excel_Toolkit": {
       "built_against": {
         "core": null,
         "deps": {
           "proto-BHoM": "be891e99-bf315cc9",
-          "proto-BHoM_Adapter": "dd15124d-62230eed",
-          "proto-BHoM_Engine": "9047606f-f8e6169a"
+          "proto-BHoM_Adapter": "dd15124d-16d105b2",
+          "proto-BHoM_Engine": "a4751ac5-f8e6169a"
         }
       },
       "ok": true,
       "sha": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
-      "sha256": "a5c69dc28de8f8860d1f3767726c1f3aec1939ad5eef923acb8dc3829ebe06d1",
-      "source": "integrator-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-Excel_Toolkit-10a677b8-182517b4/proto-Excel_Toolkit.zip",
-      "version": "10a677b8-182517b4"
+      "sha256": "9f3dfb25ad4a17dd9bc65bf306024cdbd1896a5bdee1e09626f26da5e16633e1",
+      "source": "integrator-rebuild",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-Excel_Toolkit-10a677b8-10902a7b/proto-Excel_Toolkit.zip",
+      "version": "10a677b8-10902a7b"
     },
     "proto-HTTP_Toolkit": {
       "built_against": {
         "core": null,
         "deps": {
           "proto-BHoM": "be891e99-bf315cc9",
-          "proto-BHoM_Adapter": "dd15124d-62230eed",
-          "proto-BHoM_Engine": "9047606f-f8e6169a"
+          "proto-BHoM_Adapter": "dd15124d-16d105b2",
+          "proto-BHoM_Engine": "a4751ac5-f8e6169a"
         }
       },
       "ok": true,
-      "sha": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97",
-      "sha256": "5887c5e81b9632257e0627ee43cf582f56d7d70c1da9bb0d8afeb314d461f32a",
+      "sha": "b93b536972b63a6718c8e4f1902843c0308698f1",
+      "sha256": "ba2de36177e634e73960741e09ed6897865853157a05cba714ef523bfd29e373",
       "source": "integrator-rebuild",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-HTTP_Toolkit-4f3d9bbe-182517b4/proto-HTTP_Toolkit.zip",
-      "version": "4f3d9bbe-182517b4"
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-HTTP_Toolkit-b93b5369-10902a7b/proto-HTTP_Toolkit.zip",
+      "version": "b93b5369-10902a7b"
     },
     "proto-PowerPoint_Toolkit": {
       "built_against": {
         "core": null,
         "deps": {
           "proto-BHoM": "be891e99-bf315cc9",
-          "proto-BHoM_Adapter": "dd15124d-62230eed",
-          "proto-BHoM_Engine": "9047606f-f8e6169a",
-          "proto-Excel_Toolkit": "10a677b8-182517b4"
+          "proto-BHoM_Adapter": "dd15124d-16d105b2",
+          "proto-BHoM_Engine": "a4751ac5-f8e6169a",
+          "proto-Excel_Toolkit": "10a677b8-10902a7b"
         }
       },
       "ok": true,
       "sha": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa",
-      "sha256": "79e8d69eadc49445b613f5d1f0d1a1bf48f78bd784638c3dcda970f4cdb7b9be",
-      "source": "integrator-release",
-      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-PowerPoint_Toolkit-1e03cd17-ac70d54f/proto-PowerPoint_Toolkit.zip",
-      "version": "1e03cd17-ac70d54f"
+      "sha256": "803c4e76a731377f6cf5b8e20eb8ed3a0b28660fdbda6339b2263c1f8e645a0e",
+      "source": "integrator-rebuild",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-PowerPoint_Toolkit-1e03cd17-672f15ed/proto-PowerPoint_Toolkit.zip",
+      "version": "1e03cd17-672f15ed"
     }
   }
 }

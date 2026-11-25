@@ -3,9 +3,9 @@
   "integrated": {
     "proto-BHoM": "be891e991dcdfd0dc2fcb04bac89504b6a0ff659",
     "proto-BHoM_Adapter": "dd15124dd69b47de3a55b409beed7e2924702abd",
-    "proto-BHoM_Engine": "9047606f4fcf0802018a5ca5f47352bc2b5f5832",
+    "proto-BHoM_Engine": "a4751ac5644c5c48f4b1ed2551afbc474e9afb36",
     "proto-Excel_Toolkit": "10a677b82be21eacaa232d5c7946b67ba1bf6614",
-    "proto-HTTP_Toolkit": "4f3d9bbe7a7e1c9c11d1b2a9161ffcd3193dea97",
+    "proto-HTTP_Toolkit": "b93b536972b63a6718c8e4f1902843c0308698f1",
     "proto-PowerPoint_Toolkit": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa"
   },
   "pending": [],
@@ -704,6 +704,46 @@
       "outcome": "advanced",
       "policy": "E",
       "t": "2026-11-25T19:49:04Z"
+    },
+    {
+      "advanced": [
+        "proto-BHoM_Adapter",
+        "proto-BHoM_Engine",
+        "proto-Excel_Toolkit",
+        "proto-HTTP_Toolkit",
+        "proto-PowerPoint_Toolkit"
+      ],
+      "blame": [
+        {
+          "pr": 4,
+          "repo": "proto-HTTP_Toolkit",
+          "sha": "b93b536972b63a6718c8e4f1902843c0308698f1"
+        },
+        {
+          "pr": 3,
+          "repo": "proto-BHoM_Engine",
+          "sha": "a4751ac5644c5c48f4b1ed2551afbc474e9afb36"
+        }
+      ],
+      "build_order": [
+        "proto-BHoM_Engine",
+        "proto-BHoM_Adapter",
+        "proto-Excel_Toolkit",
+        "proto-HTTP_Toolkit",
+        "proto-PowerPoint_Toolkit"
+      ],
+      "changes": {
+        "proto-BHoM_Engine": "a4751ac5644c5c48f4b1ed2551afbc474e9afb36",
+        "proto-HTTP_Toolkit": "b93b536972b63a6718c8e4f1902843c0308698f1"
+      },
+      "cleared": [],
+      "dropped": [],
+      "failing": [],
+      "mode": "hold",
+      "note": "series",
+      "outcome": "advanced",
+      "policy": "E",
+      "t": "2026-11-25T19:55:49Z"
     }
   ],
   "waiting": {}
