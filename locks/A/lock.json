@@ -1,4 +1,31 @@
 {
   "core": null,
-  "modules": {}
+  "modules": {
+    "proto-BHoM": {
+      "built_against": {
+        "core": null,
+        "deps": {}
+      },
+      "ok": true,
+      "sha": "be891e991dcdfd0dc2fcb04bac89504b6a0ff659",
+      "sha256": "ad591d24f1e394a4fb2d46a53f9f706a36a30287ab5657dc096d252689248297",
+      "source": "module-release",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM/releases/download/m-be891e99-bf315cc9/proto-BHoM.zip",
+      "version": "be891e99-bf315cc9"
+    },
+    "proto-BHoM_Engine": {
+      "built_against": {
+        "core": null,
+        "deps": {
+          "proto-BHoM": "be891e99-bf315cc9"
+        }
+      },
+      "ok": true,
+      "sha": "1bdcce4a344154c8ff966e0838ab3a167ced4767",
+      "sha256": "09b07c180ea2680a7d5e7b3dc9b5f652e25c1afb9630df8ccbcae3a60fd24f67",
+      "source": "integrator-rebuild",
+      "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Engine-1bdcce4a-f8e6169a/proto-BHoM_Engine.zip",
+      "version": "1bdcce4a-f8e6169a"
+    }
+  }
 }
