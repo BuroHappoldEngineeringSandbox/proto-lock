@@ -10,7 +10,20 @@
   },
   "pending": [],
   "pending_on_upstream": {},
-  "quarantine": {},
+  "quarantine": {
+    "proto-BHoM_Engine": {
+      "blame": [
+        {
+          "pr": 2,
+          "repo": "proto-BHoM_Engine",
+          "sha": "9047606f4fcf0802018a5ca5f47352bc2b5f5832"
+        }
+      ],
+      "reason": "breaks proto-HTTP_Toolkit",
+      "sha": "9047606f4fcf0802018a5ca5f47352bc2b5f5832",
+      "since": "2026-11-25T16:49:16Z"
+    }
+  },
   "reverted_fix": {},
   "runs": [
     {
@@ -598,6 +611,26 @@
       "outcome": "advanced",
       "policy": "A",
       "t": "2026-11-25T16:41:45Z"
+    },
+    {
+      "blame": [
+        {
+          "pr": 2,
+          "repo": "proto-BHoM_Engine",
+          "sha": "9047606f4fcf0802018a5ca5f47352bc2b5f5832"
+        }
+      ],
+      "changes": {
+        "proto-BHoM_Engine": "9047606f4fcf0802018a5ca5f47352bc2b5f5832"
+      },
+      "failing": [
+        "proto-HTTP_Toolkit"
+      ],
+      "mode": "hold",
+      "note": "single",
+      "outcome": "held: change breaks a dependent",
+      "policy": "A",
+      "t": "2026-11-25T16:48:29Z"
     }
   ],
   "waiting": {}
